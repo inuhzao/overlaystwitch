@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inuhzao Overlay Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent: #7a7a8a;
+  --accent-dim: rgba(120,120,140,0.35);
+  --accent-glow: rgba(120,120,140,0.12);
+  --green: #4caf50;
+  --orange: #e07040;
+  --bg-deep: #f0ede8;
+  --bg-bar: #e8e4de;
+  --bg-card: #ece9e3;
+  --bg-header: #e4e0da;
+  --text: #1a1a1e;
+  --text-dim: #6b6b78;
+  --border: rgba(100,100,115,0.22);
+  --viewers: #5a8ac6;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Exo 2', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* ─── HEADER ─── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border);
+}
+.app-logo {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text);
+}
+.app-logo em { color: var(--accent); font-style: normal; }
+.app-subtitle { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(76,175,80,.12);
+  border: 1px solid rgba(76,175,80,.35);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 1px;
+  font-family: 'Rajdhani', sans-serif;
+}
+.live-dot { width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)} }
+
+/* ─── TABS ─── */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-header);
+  padding: 0 16px;
+}
+.tab {
+  padding: 11px 20px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--text-dim);
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
+  user-select: none;
+  white-space: nowrap;
+}
+.tab.active { color: var(--text); border-bottom-color: var(--accent); }
+.tab:hover:not(.active) { color: var(--text); }
+
+/* ─── PANELS ─── */
+.panel { display: none; flex: 1; }
+.panel.active { display: flex; flex-direction: column; }
+
+/* ─── OVERLAY PREVIEW PANEL ─── */
+.overlay-scene {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 40px 20px;
+  background: #d8d4ce;
+  position: relative;
+}
+.overlay-scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(100,100,115,.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+.scene-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  position: relative;
+}
+
+/* THE OVERLAY BAR */
+.overlay-bar {
+  width: 100%;
+  max-width: 960px;
+  height: 42px;
+  background: linear-gradient(90deg, #eae6e0 0%, #f0ede8 50%, #e6e2dc 100%);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.6);
+}
+.overlay-bar::after {
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;height:1px;
+  background: linear-gradient(90deg, transparent, rgba(120,120,140,.4) 40%, rgba(120,120,140,.4) 60%, transparent);
+}
+
+.ob-logo {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 2px;
+  flex-shrink: 0;
+  margin-right: 10px;
+  white-space: nowrap;
+}
+.ob-logo em { color: var(--accent); font-style: normal; }
+
+.ob-div {
+  width:1px;height:20px;
+  background: var(--border);
+  margin: 0 9px;
+  flex-shrink:0;
+}
+
+.ob-icons { display:flex;gap:5px;flex-shrink:0; }
+.ob-icon {
+  width:24px;height:24px;border-radius:50%;
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-dim);
+  transition: all .2s;
+  cursor:default;
+  background: rgba(255,255,255,.5);
+}
+.ob-icon:hover { border-color:var(--accent);color:var(--text); }
+.ob-icon svg { width:11px;height:11px;fill:currentColor; }
+
+.ob-toggle-wrap { display:flex;align-items:center;gap:7px;flex-shrink:0; }
+.ob-mode-lbl {
+  font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  transition:color .3s;white-space:nowrap;
+}
+.ob-mode-lbl.active-wager { color: var(--orange); }
+.ob-mode-lbl.active-raw   { color: var(--green); }
+.ob-mode-lbl.inactive     { color: var(--text-dim); }
+
+.ob-pill {
+  width:32px;height:17px;border-radius:9px;
+  position:relative;transition:background .35s,box-shadow .35s;
+  flex-shrink:0;
+}
+.ob-pill.wager { background:linear-gradient(90deg,var(--orange),#c83010);box-shadow:0 0 8px rgba(224,112,64,.4); }
+.ob-pill.raw   { background:linear-gradient(90deg,#388e3c,var(--green));box-shadow:0 0 8px rgba(76,175,80,.4); }
+.ob-pill::after {
+  content:'';position:absolute;
+  width:13px;height:13px;background:#fff;border-radius:50%;
+  top:2px;transition:left .35s;
+  box-shadow:0 1px 3px rgba(0,0,0,.25);
+}
+.ob-pill.wager::after { left:2px; }
+.ob-pill.raw::after   { left:17px; }
+
+/* VIEWERS */
+.ob-viewers {
+  display:flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;color:var(--viewers);
+  font-family:'Rajdhani',sans-serif;letter-spacing:.5px;
+  flex-shrink:0;
+}
+.ob-viewers svg { width:13px;height:13px;fill:var(--viewers);flex-shrink:0; }
+.ob-viewers .vcount { font-size:12px; }
+
+/* SOCIAL CAROUSEL */
+.ob-social-carousel { display:flex;align-items:center;flex-shrink:0;overflow:hidden;position:relative; }
+.ob-soc-slide {
+  display:flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;
+  position:absolute;
+  transition:opacity .5s, transform .5s;
+  opacity:0;transform:translateX(20px);
+}
+.ob-soc-slide.active { opacity:1;transform:translateX(0);position:relative; }
+.ob-soc-slide.out    { opacity:0;transform:translateX(-20px);position:absolute; }
+.ob-soc-slide svg { width:13px;height:13px;flex-shrink:0; }
+.ob-soc-hide-btn {
+  width:16px;height:16px;border-radius:50%;
+  border:1px solid var(--border);background:rgba(255,255,255,.6);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;margin-left:4px;
+  color:var(--text-dim);font-size:9px;line-height:1;
+  transition:all .2s;
+}
+.ob-soc-hide-btn:hover { background:#fff;color:var(--text); }
+
+.ob-spacer { flex:1; }
+
+.ob-right { display:flex;align-items:center; }
+.ob-ri {
+  display:flex;align-items:center;gap:5px;
+  padding:0 10px;border-left:1px solid var(--border);
+  font-size:11px;font-weight:600;color:var(--text-dim);white-space:nowrap;
+}
+.ob-ri svg { width:11px;height:11px;fill:var(--text-dim);flex-shrink:0; }
+.ob-ri.web { color:var(--text); }
+.ob-ri .dot { width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0; }
+.ob-age {
+  background:rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.12);
+  border-radius:2px;padding:0 3px;font-size:8px;font-weight:800;
+  color:var(--text-dim);
+}
+
+/* ─── QUICK CONTROLS ─── */
+.quick-controls {
+  display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;position:relative;
+}
+.status { display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim); }
+.status-dot { width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite; }
+
+/* ─── CONTROL PANEL ─── */
+.control-panel {
+  flex:1;padding:24px;
+  display:flex;flex-direction:column;gap:20px;
+  overflow-y:auto;max-height:calc(100vh - 120px);
+}
+.section-title {
+  font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--accent);
+  margin-bottom:10px;
+}
+.card {
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:8px;padding:18px 22px;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+
+/* BIG TOGGLE */
+.toggle-row { display:flex;align-items:center;gap:18px;flex-wrap:wrap; }
+.big-toggle-wrap { display:flex;align-items:center;gap:14px; }
+.big-lbl {
+  font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  min-width:80px;text-align:center;transition:color .3s;
+}
+.big-lbl.active-wager { color: var(--orange); }
+.big-lbl.active-raw   { color: var(--green); }
+.big-lbl.inactive     { color: var(--text-dim); }
+
+.big-pill {
+  width:76px;height:38px;border-radius:19px;cursor:pointer;
+  position:relative;transition:background .35s,box-shadow .35s;
+  flex-shrink:0;
+}
+.big-pill.wager { background:linear-gradient(90deg,var(--orange),#c83010);box-shadow:0 0 16px rgba(224,112,64,.35); }
+.big-pill.raw   { background:linear-gradient(90deg,#388e3c,var(--green));box-shadow:0 0 16px rgba(76,175,80,.35); }
+.big-pill::after {
+  content:'';position:absolute;
+  width:30px;height:30px;background:#fff;border-radius:50%;
+  top:4px;transition:left .35s;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
+}
+.big-pill.wager::after { left:4px; }
+.big-pill.raw::after   { left:42px; }
+
+.mode-info { flex:1;min-width:180px; }
+.mode-info strong {
+  display:block;font-size:14px;font-weight:700;
+  font-family:'Rajdhani',sans-serif;letter-spacing:1px;
+  margin-bottom:4px;
+}
+.mode-info.wager strong { color:var(--orange); }
+.mode-info.raw strong   { color:var(--green); }
+.mode-info p { font-size:12px;color:var(--text-dim);line-height:1.5; }
+
+/* FIELDS */
+.fields-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+@media(max-width:600px){ .fields-grid{grid-template-columns:1fr;} }
+.field { display:flex;flex-direction:column;gap:5px; }
+.field label { font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:.8px;text-transform:uppercase; }
+.field input {
+  background:rgba(255,255,255,.7);border:1px solid var(--border);
+  border-radius:5px;padding:9px 12px;color:var(--text);
+  font-family:'Exo 2',sans-serif;font-size:13px;
+  outline:none;transition:border .2s;
+}
+.field input:focus { border-color:var(--accent); }
+.field input::placeholder { color:var(--text-dim);opacity:.5; }
+
+/* SOCIAL VISIBILITY CONTROLS */
+.soc-visibility {
+  display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center;
+}
+.soc-vis-btn {
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:6px;
+  border:1px solid var(--border);background:rgba(255,255,255,.6);
+  cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:12px;
+  font-weight:700;letter-spacing:1px;color:var(--text);
+  transition:all .2s;
+}
+.soc-vis-btn.hidden-social {
+  opacity:.5;background:rgba(0,0,0,.05);
+  text-decoration: line-through;
+}
+.soc-vis-btn:hover { background:#fff;border-color:var(--accent); }
+
+.btn-row { display:flex;gap:10px;flex-wrap:wrap; }
+.btn {
+  padding:9px 20px;border-radius:6px;border:none;cursor:pointer;
+  font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;
+}
+.btn-primary { background:var(--accent);color:#fff; }
+.btn-primary:hover { background:#5a5a70;box-shadow:0 0 12px rgba(120,120,140,.3); }
+.btn-outline { background:transparent;color:var(--accent);border:1px solid var(--accent); }
+.btn-outline:hover { background:var(--accent-glow); }
+.btn-toggle-wager { background:linear-gradient(90deg,var(--orange),#c83010);color:#fff; }
+.btn-toggle-wager:hover { box-shadow:0 0 12px rgba(224,112,64,.4); }
+.btn-toggle-raw { background:linear-gradient(90deg,#388e3c,var(--green));color:#fff; }
+.btn-toggle-raw:hover { box-shadow:0 0 12px rgba(76,175,80,.4); }
+
+/* ─── OBS PANEL ─── */
+.obs-box {
+  background:rgba(0,0,0,.04);border:1px dashed var(--border);
+  border-radius:7px;padding:16px 18px;
+  font-size:12px;color:var(--text-dim);line-height:2;
+}
+.obs-box code {
+  background:rgba(120,120,140,.12);color:var(--accent);
+  padding:1px 6px;border-radius:3px;font-size:11px;font-family:monospace;
+}
+.obs-box strong { color:var(--text); }
+
+.url-display { display:flex;gap:8px;align-items:center;margin:12px 0; }
+.url-display input {
+  flex:1;background:rgba(255,255,255,.7);border:1px solid var(--border);
+  border-radius:5px;padding:9px 12px;color:var(--accent);
+  font-size:11px;outline:none;font-family:monospace;cursor:text;
+}
+.copy-btn {
+  padding:9px 16px;background:rgba(120,120,140,.1);border:1px solid var(--accent);
+  border-radius:5px;color:var(--accent);font-size:12px;font-weight:700;
+  font-family:'Rajdhani',sans-serif;letter-spacing:1px;cursor:pointer;
+  transition:all .2s;white-space:nowrap;
+}
+.copy-btn:hover { background:var(--accent);color:#fff; }
+.copy-btn.copied { background:var(--green);border-color:var(--green);color:#fff; }
+
+.dim-cards { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0; }
+@media(max-width:500px){.dim-cards{grid-template-columns:1fr 1fr;}}
+.dim-card {
+  background:rgba(120,120,140,.07);border:1px solid var(--border);
+  border-radius:6px;padding:10px 12px;text-align:center;
+}
+.dim-card .dim-val {
+  font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;
+  color:var(--accent);display:block;
+}
+.dim-card .dim-lab { font-size:9px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase; }
+
+/* TOAST */
+.toast {
+  position:fixed;bottom:24px;right:24px;
+  background:#fff;border:1px solid var(--border);
+  border-radius:7px;padding:11px 18px;
+  font-size:12px;font-weight:600;color:var(--text);
+  transform:translateY(60px);opacity:0;
+  transition:all .3s;pointer-events:none;
+  z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.12);
+}
+.toast.show { transform:translateY(0);opacity:1; }
+
+/* OVERLAY-ONLY MODE (for OBS) */
+body.obs-mode .app-header,
+body.obs-mode .tabs,
+body.obs-mode .panel,
+body.obs-mode .quick-controls,
+body.obs-mode .scene-label { display:none!important; }
+body.obs-mode { background:transparent; }
+body.obs-mode .overlay-scene {
+  display:flex!important;background:transparent;
+  padding:0;min-height:auto;
+}
+body.obs-mode .overlay-bar {
+  border-radius:0;border:none;
+  max-width:100%;width:100vw;
+  box-shadow:none;
+}
+
+/* TWITCH NOTE */
+.twitch-note {
+  font-size:11px;color:var(--text-dim);margin-top:10px;line-height:1.6;
+  padding:10px 14px;background:rgba(120,120,140,.08);border-radius:6px;
+  border-left:3px solid var(--viewers);
+}
+.twitch-note strong { color:var(--viewers); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div>
+    <div class="app-logo">INU<em>H</em>ZAO <span style="font-size:13px;color:var(--text-dim);font-weight:500;letter-spacing:1px;">OVERLAY</span></div>
+    <div class="app-subtitle">Stream Overlay Manager</div>
+  </div>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    LIVE
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('overlay')">🎬 Preview</div>
+  <div class="tab" onclick="switchTab('control')">⚙️ Controlo</div>
+  <div class="tab" onclick="switchTab('obs')">📡 OBS Setup</div>
+</div>
+
+<!-- ══════════════════════════════════════ OVERLAY PREVIEW ══ -->
+<div class="panel active" id="panel-overlay">
+  <div class="overlay-scene">
+    <div class="scene-label">Preview em tempo real</div>
+
+    <!-- THE BAR -->
+    <div class="overlay-bar" id="obs-bar">
+      <svg width="0" height="0" style="position:absolute">
+        <defs>
+          <linearGradient id="ig-g" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#f09433"/>
+            <stop offset="50%" style="stop-color:#dc2743"/>
+            <stop offset="100%" style="stop-color:#bc1888"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <div class="ob-logo" id="bar-logo">INU<em>H</em>ZAO</div>
+      <div class="ob-div"></div>
+
+      <div class="ob-icons">
+        <div class="ob-icon" title="Relógio"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg></div>
+        <div class="ob-icon" title="Play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="ob-icon" title="Gamepad"><svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5S14.67 12 15.5 12s1.5.67 1.5 1.5S16.33 15 15.5 15zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5S19.33 12 18.5 12z"/></svg></div>
+      </div>
+      <div class="ob-div"></div>
+
+      <!-- TOGGLE -->
+      <div class="ob-toggle-wrap">
+        <span class="ob-mode-lbl inactive" id="bar-lbl-wager">WAGER</span>
+        <div class="ob-pill raw" id="bar-pill" onclick="quickToggle()" style="cursor:pointer"></div>
+        <span class="ob-mode-lbl active-raw" id="bar-lbl-raw">RAW</span>
+      </div>
+      <div class="ob-div"></div>
+
+      <!-- VIEWERS -->
+      <div class="ob-viewers" id="bar-viewers">
+        <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+        <span class="vcount" id="viewer-count">—</span>
+      </div>
+      <div class="ob-div"></div>
+
+      <!-- SOCIAL CAROUSEL -->
+      <div class="ob-social-carousel" id="social-carousel" style="min-width:130px;">
+        <!-- slides injected by JS -->
+      </div>
+      <button class="ob-soc-hide-btn" id="hide-soc-btn" title="Esconder/Mostrar rede atual" onclick="toggleCurrentSocial()">✕</button>
+
+      <div class="ob-spacer"></div>
+
+      <div class="ob-right">
+        <div class="ob-ri web">
+          <div class="dot"></div>
+          <span id="bar-web">inuhzao.tv</span>
+        </div>
+        <div class="ob-ri">
+          <span class="ob-age">+18</span>
+          GAMBLE AWARE
+        </div>
+        <div class="ob-ri">
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+          <span id="bar-clock">-- --- -- · --:--</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-controls">
+      <div class="status"><div class="status-dot"></div>Preview ao vivo</div>
+      <button class="btn btn-outline" onclick="quickToggle()" id="btn-quick-toggle">⇄ Toggle WAGER / RAW</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ CONTROL PANEL ══ -->
+<div class="panel" id="panel-control">
+  <div class="control-panel">
+
+    <!-- MODO -->
+    <div>
+      <div class="section-title">Modo de Stream</div>
+      <div class="card">
+        <div class="toggle-row">
+          <div class="big-toggle-wrap">
+            <div class="big-lbl inactive" id="ctrl-lbl-wager">WAGER</div>
+            <div class="big-pill raw" id="ctrl-pill" onclick="quickToggle()"></div>
+            <div class="big-lbl active-raw" id="ctrl-lbl-raw">RAW</div>
+          </div>
+          <div class="mode-info raw" id="ctrl-mode-info">
+            <strong id="ctrl-mode-name">Modo RAW</strong>
+            <p id="ctrl-mode-desc">Stream sem apostas — conteúdo normal, entretenimento puro. O toggle mostra RAW ativo.</p>
+          </div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-toggle-wager" onclick="setMode('wager')">🎰 Ativar WAGER</button>
+          <button class="btn btn-toggle-raw" onclick="setMode('raw')">🎮 Ativar RAW</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REDES SOCIAIS -->
+    <div>
+      <div class="section-title">Redes Sociais &amp; Identidade</div>
+      <div class="card">
+        <div class="fields-grid">
+          <div class="field">
+            <label>Nome / Logo</label>
+            <input type="text" id="cfg-name" value="INUHZAO" placeholder="Ex: INUHZAO" oninput="applyConfig()">
+          </div>
+          <div class="field">
+            <label>Website</label>
+            <input type="text" id="cfg-web" value="inuhzao.tv" placeholder="inuhzao.tv" oninput="applyConfig()">
+          </div>
+          <div class="field">
+            <label>Instagram</label>
+            <input type="text" id="cfg-ig" value="@inuhzao" placeholder="@username" oninput="applyConfig()">
+          </div>
+          <div class="field">
+            <label>TikTok</label>
+            <input type="text" id="cfg-tt" value="@inuhzao" placeholder="@username" oninput="applyConfig()">
+          </div>
+        </div>
+
+        <!-- VISIBILITY CONTROLS -->
+        <div style="margin-top:16px;">
+          <div style="font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;">Visibilidade na Overlay</div>
+          <div class="soc-visibility">
+            <button class="soc-vis-btn" id="vis-ig" onclick="toggleSocialVisibility('ig')">
+              <svg viewBox="0 0 24 24" width="14" height="14" style="fill:url(#ig-g2)"><defs><linearGradient id="ig-g2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#f09433"/><stop offset="50%" style="stop-color:#dc2743"/><stop offset="100%" style="stop-color:#bc1888"/></linearGradient></defs><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              Instagram
+            </button>
+            <button class="soc-vis-btn" id="vis-tt" onclick="toggleSocialVisibility('tt')">
+              <svg viewBox="0 0 24 24" width="14" height="14" style="fill:#1a1a1e;"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.55V6.79a4.85 4.85 0 01-1.04-.1z"/></svg>
+              TikTok
+            </button>
+            <button class="soc-vis-btn" id="vis-web" onclick="toggleSocialVisibility('web')">
+              <svg viewBox="0 0 24 24" width="14" height="14" style="fill:var(--accent);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+              Website
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;" class="btn-row">
+          <button class="btn btn-primary" onclick="saveConfig()">💾 Guardar</button>
+          <button class="btn btn-outline" onclick="loadConfig()">↺ Repor guardado</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEWERS INFO -->
+    <div>
+      <div class="section-title">Viewers em Tempo Real</div>
+      <div class="card">
+        <div class="twitch-note">
+          <strong>👁 Viewers Twitch ao vivo</strong><br>
+          A contagem de viewers é buscada da API pública da Twitch para o canal <strong>inuhzao</strong> a cada 60 segundos. Funciona automaticamente quando a overlay está aberta e o canal está em live.
+          <br><br>
+          Nota: A API pública da Twitch requer autenticação para dados em tempo real. Se o número não aparecer, o canal pode não estar em live neste momento ou pode precisar de um token de API. O número mostrado na overlay é automaticamente atualizado.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ OBS SETUP ══ -->
+<div class="panel" id="panel-obs">
+  <div class="control-panel">
+
+    <div>
+      <div class="section-title">Configuração no OBS</div>
+      <div class="card">
+        <div class="obs-box">
+          <strong>1. Guarda este ficheiro no teu computador</strong><br>
+          Guarda como <code>inuhzao_overlay.html</code> em qualquer pasta.<br><br>
+          <strong>2. Adiciona Browser Source no OBS</strong><br>
+          Cenas → clica <code>+</code> em Fontes → <code>Navegador (Browser Source)</code><br><br>
+          <strong>3. Usa o URL local do ficheiro</strong>
+          <div class="url-display">
+            <input type="text" id="obs-url-input" value="file:///C:/Users/TeuNome/inuhzao_overlay.html?obs=1" readonly>
+            <button class="copy-btn" id="copy-url-btn" onclick="copyUrl()">Copiar</button>
+          </div>
+          Adiciona <code>?obs=1</code> no fim do URL para mostrar só a barra (sem o painel).<br><br>
+          <strong>4. Dimensões recomendadas</strong>
+          <div class="dim-cards">
+            <div class="dim-card"><span class="dim-val">1920</span><span class="dim-lab">Largura (px)</span></div>
+            <div class="dim-card"><span class="dim-val">44</span><span class="dim-lab">Altura (px)</span></div>
+            <div class="dim-card"><span class="dim-val">1</span><span class="dim-lab">FPS (mínimo)</span></div>
+          </div>
+          <strong>5. CSS personalizado no OBS</strong><br>
+          No campo "CSS Personalizado" cola:<br>
+          <code>body { background: transparent !important; overflow: hidden; }</code>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Dicas</div>
+      <div class="card">
+        <div class="obs-box">
+          • O relógio atualiza automaticamente a cada minuto<br>
+          • Os viewers atualizam a cada 60 segundos (quando o canal está em live)<br>
+          • Para mudar WAGER ↔ RAW: usa o toggle no tab <strong>Controlo</strong><br>
+          • Podes esconder redes sociais individualmente no tab <strong>Controlo</strong><br>
+          • O carrossel alterna automaticamente entre as redes ativas a cada 4s<br>
+          • Guarda a configuração no tab Controlo — fica guardada no browser
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE ───
+let mode = 'raw';
+let socialVisibility = { ig: true, tt: true, web: true };
+let carouselIndex = 0;
+let carouselTimer = null;
+let viewerTimer = null;
+
+// Check for OBS mode
+if (window.location.search.includes('obs=1')) {
+  document.body.classList.add('obs-mode');
+}
+
+// ─── TABS ───
+function switchTab(tab) {
+  ['overlay','control','obs'].forEach((t,i) => {
+    document.querySelectorAll('.tab')[i].classList.toggle('active', t===tab);
+  });
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+// ─── MODE ───
+function setMode(m) {
+  mode = m;
+  const pill = document.getElementById('bar-pill');
+  const lblW = document.getElementById('bar-lbl-wager');
+  const lblR = document.getElementById('bar-lbl-raw');
+  pill.className = 'ob-pill ' + mode;
+  lblW.className = 'ob-mode-lbl ' + (mode==='wager' ? 'active-wager' : 'inactive');
+  lblR.className = 'ob-mode-lbl ' + (mode==='raw'   ? 'active-raw'   : 'inactive');
+
+  const cp = document.getElementById('ctrl-pill');
+  const cw = document.getElementById('ctrl-lbl-wager');
+  const cr = document.getElementById('ctrl-lbl-raw');
+  const ci = document.getElementById('ctrl-mode-info');
+  const cn = document.getElementById('ctrl-mode-name');
+  const cd = document.getElementById('ctrl-mode-desc');
+  cp.className = 'big-pill ' + mode;
+  cw.className = 'big-lbl ' + (mode==='wager' ? 'active-wager' : 'inactive');
+  cr.className = 'big-lbl ' + (mode==='raw'   ? 'active-raw'   : 'inactive');
+  if (mode==='raw') {
+    ci.className='mode-info raw';
+    cn.textContent='Modo RAW';
+    cd.textContent='Stream sem apostas — conteúdo normal, entretenimento puro.';
+  } else {
+    ci.className='mode-info wager';
+    cn.textContent='Modo WAGER';
+    cd.textContent='Stream com apostas ativas — gambling content. O toggle mostra WAGER ativo.';
+  }
+  // Guarda automaticamente ao mudar de modo
+  try {
+    const raw = localStorage.getItem('inuhzao_cfg');
+    const cfg = raw ? JSON.parse(raw) : {};
+    cfg.mode = mode;
+    localStorage.setItem('inuhzao_cfg', JSON.stringify(cfg));
+  } catch(e){}
+  showToast('Modo alterado → ' + mode.toUpperCase());
+}
+
+function quickToggle() { setMode(mode === 'raw' ? 'wager' : 'raw'); }
+
+// ─── SOCIAL VISIBILITY ───
+const socialDefs = {
+  ig: {
+    label: '@inuhzao',
+    icon: `<svg viewBox="0 0 24 24" style="fill:url(#ig-g)"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`
+  },
+  tt: {
+    label: '@inuhzao',
+    icon: `<svg viewBox="0 0 24 24" style="fill:#1a1a1e;width:12px;height:12px;"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.55V6.79a4.85 4.85 0 01-1.04-.1z"/></svg>`
+  },
+  web: {
+    label: 'inuhzao.tv',
+    icon: `<svg viewBox="0 0 24 24" style="fill:var(--accent);width:12px;height:12px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`
+  }
+};
+
+function getActiveSocials() {
+  return Object.keys(socialVisibility).filter(k => socialVisibility[k]);
+}
+
+function buildCarousel() {
+  const container = document.getElementById('social-carousel');
+  container.innerHTML = '';
+  const active = getActiveSocials();
+  if (!active.length) {
+    container.style.display = 'none';
+    document.getElementById('hide-soc-btn').style.display = 'none';
+    return;
+  }
+  container.style.display = 'flex';
+  document.getElementById('hide-soc-btn').style.display = 'flex';
+  active.forEach((key, i) => {
+    const def = socialDefs[key];
+    const div = document.createElement('div');
+    div.className = 'ob-soc-slide' + (i === carouselIndex % active.length ? ' active' : '');
+    div.id = 'slide-' + key;
+    div.innerHTML = def.icon + `<span style="margin-left:3px;">${def.label}</span>`;
+    container.appendChild(div);
+  });
+}
+
+function startCarousel() {
+  if (carouselTimer) clearInterval(carouselTimer);
+  carouselTimer = setInterval(() => {
+    const active = getActiveSocials();
+    if (active.length <= 1) return;
+    const slides = document.querySelectorAll('.ob-soc-slide');
+    const current = Array.from(slides).findIndex(s => s.classList.contains('active'));
+    const next = (current + 1) % slides.length;
+    slides[current].classList.remove('active');
+    slides[current].classList.add('out');
+    slides[next].classList.add('active');
+    setTimeout(() => slides[current].classList.remove('out'), 600);
+  }, 4000);
+}
+
+function toggleSocialVisibility(key) {
+  socialVisibility[key] = !socialVisibility[key];
+  const btn = document.getElementById('vis-' + key);
+  btn.classList.toggle('hidden-social', !socialVisibility[key]);
+  carouselIndex = 0;
+  buildCarousel();
+  startCarousel();
+  showToast(key.toUpperCase() + (socialVisibility[key] ? ' visível' : ' escondido'));
+}
+
+function toggleCurrentSocial() {
+  const active = getActiveSocials();
+  if (!active.length) return;
+  const slides = document.querySelectorAll('.ob-soc-slide');
+  let currentKey = null;
+  slides.forEach(s => {
+    if (s.classList.contains('active')) {
+      currentKey = s.id.replace('slide-', '');
+    }
+  });
+  if (currentKey) toggleSocialVisibility(currentKey);
+}
+
+// ─── CONFIG ───
+function applyConfig() {
+  const name = document.getElementById('cfg-name').value || 'INUHZAO';
+  const ig   = document.getElementById('cfg-ig').value   || '@inuhzao';
+  const tt   = document.getElementById('cfg-tt').value   || '@inuhzao';
+  const web  = document.getElementById('cfg-web').value  || 'inuhzao.tv';
+
+  const mid = Math.ceil(name.length / 2);
+  document.getElementById('bar-logo').innerHTML =
+    name.slice(0, mid-1) + '<em>' + (name[mid-1]||'') + '</em>' + name.slice(mid);
+
+  socialDefs.ig.label = ig;
+  socialDefs.tt.label = tt;
+  socialDefs.web.label = web;
+
+  document.getElementById('bar-web').textContent = web;
+
+  buildCarousel();
+  startCarousel();
+}
+
+function saveConfig() {
+  const cfg = {
+    name: document.getElementById('cfg-name').value,
+    ig:   document.getElementById('cfg-ig').value,
+    tt:   document.getElementById('cfg-tt').value,
+    web:  document.getElementById('cfg-web').value,
+    mode: mode,
+    visibility: socialVisibility
+  };
+  try {
+    localStorage.setItem('inuhzao_cfg', JSON.stringify(cfg));
+    showToast('✓ Configuração guardada!');
+  } catch(e) { showToast('Erro ao guardar config'); }
+}
+
+function loadConfig() {
+  try {
+    const raw = localStorage.getItem('inuhzao_cfg');
+    if (!raw) { applyConfig(); return; }
+    const cfg = JSON.parse(raw);
+    document.getElementById('cfg-name').value = cfg.name || 'INUHZAO';
+    document.getElementById('cfg-ig').value   = cfg.ig   || '@inuhzao';
+    document.getElementById('cfg-tt').value   = cfg.tt   || '@inuhzao';
+    document.getElementById('cfg-web').value  = cfg.web  || 'inuhzao.tv';
+    if (cfg.visibility) {
+      socialVisibility = cfg.visibility;
+      Object.keys(socialVisibility).forEach(k => {
+        const btn = document.getElementById('vis-' + k);
+        if (btn) btn.classList.toggle('hidden-social', !socialVisibility[k]);
+      });
+    }
+    applyConfig();
+    if (cfg.mode) setMode(cfg.mode);
+  } catch(e) { showToast('Erro ao carregar config'); }
+}
+
+// ─── CLOCK ───
+function updateClock() {
+  const now = new Date();
+  const months = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+  const d = String(now.getDate()).padStart(2,'0');
+  const m = months[now.getMonth()];
+  const y = String(now.getFullYear()).slice(2);
+  const h = String(now.getHours()).padStart(2,'0');
+  const min = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('bar-clock').textContent = d+' '+m+' '+y+' · '+h+':'+min;
+}
+
+// ─── VIEWERS (Twitch) ───
+// Uses Twitch Helix API via a CORS proxy / public endpoint
+// The channel name is: inuhzao
+async function fetchViewers() {
+  const el = document.getElementById('viewer-count');
+  try {
+    // Try via twitch API — requires auth, so we use a public proxy trick
+    // We'll try to fetch the stream data via an unofficial public endpoint
+    const r = await fetch('https://api.twitch.tv/helix/streams?user_login=inuhzao', {
+      headers: {
+        'Client-Id': 'kimne78kx3ncx6brgo4mv6wki5h1ko', // public web client id
+        'Authorization': 'Bearer ' // no token available in browser context
+      }
+    });
+    // If the above fails we fall back to a scrape approach
+    throw new Error('no token');
+  } catch {
+    // Fallback: use a no-auth public Twitch endpoint via gql (public)
+    try {
+      const resp = await fetch('https://gql.twitch.tv/gql', {
+        method: 'POST',
+        headers: {
+          'Client-Id': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify([{
+          operationName: 'StreamMetadata',
+          variables: { channelLogin: 'inuhzao' },
+          extensions: {
+            persistedQuery: {
+              version: 1,
+              sha256Hash: 'a647c2a13599e5991e175155f798ca7f1ecddde73f7f341f39009c14dbf59aa8'
+            }
+          }
+        }])
+      });
+      const data = await resp.json();
+      const stream = data?.[0]?.data?.user?.stream;
+      if (stream && stream.viewersCount !== undefined) {
+        el.textContent = stream.viewersCount.toLocaleString('pt-PT');
+        el.style.color = '';
+      } else {
+        el.textContent = 'offline';
+        el.style.color = 'var(--text-dim)';
+      }
+    } catch {
+      el.textContent = '—';
+    }
+  }
+}
+
+// ─── URL ───
+function copyUrl() {
+  const url = window.location.href.split('?')[0] + '?obs=1';
+  document.getElementById('obs-url-input').value = url;
+  navigator.clipboard.writeText(url).then(()=>{
+    const b = document.getElementById('copy-url-btn');
+    b.textContent='✓ Copiado'; b.classList.add('copied');
+    setTimeout(()=>{ b.textContent='Copiar'; b.classList.remove('copied'); },2200);
+  }).catch(()=>{ showToast('Copia o URL manualmente'); });
+}
+
+// ─── TOAST ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+// ─── INIT ───
+updateClock();
+setInterval(updateClock, 30000);
+buildCarousel();
+startCarousel();
+loadConfig();
+fetchViewers();
+setInterval(fetchViewers, 60000);
+</script>
+</body>
+</html>
