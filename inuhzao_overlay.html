@@ -43,13 +43,13 @@ body {
 }
 .app-logo {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--text);
 }
 .app-logo em { color: var(--accent); font-style: normal; }
-.app-subtitle { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
+.app-subtitle { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; }
 
 .live-badge {
   display: flex;
@@ -58,14 +58,14 @@ body {
   background: rgba(76,175,80,.12);
   border: 1px solid rgba(76,175,80,.35);
   border-radius: 20px;
-  padding: 5px 12px;
-  font-size: 11px;
+  padding: 5px 14px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--green);
   letter-spacing: 1px;
   font-family: 'Rajdhani', sans-serif;
 }
-.live-dot { width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite; }
+.live-dot { width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)} }
 
 /* ─── TABS ─── */
@@ -74,11 +74,12 @@ body {
   border-bottom: 1px solid var(--border);
   background: var(--bg-header);
   padding: 0 16px;
+  overflow-x: auto;
 }
 .tab {
-  padding: 11px 20px;
+  padding: 12px 20px;
   font-family: 'Rajdhani', sans-serif;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -117,18 +118,32 @@ body {
   pointer-events: none;
 }
 .scene-label {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 2px;
   color: var(--text-dim);
   text-transform: uppercase;
   position: relative;
 }
 
+/* ─── CASINO IMAGE DISPLAY (in preview) ─── */
+.ob-casino-img {
+  width: 100%;
+  max-width: 960px;
+  position: relative;
+  display: none; /* shown when a casino is active */
+}
+.ob-casino-img img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px 4px 0 0;
+}
+
 /* THE OVERLAY BAR */
 .overlay-bar {
   width: 100%;
   max-width: 960px;
-  height: 42px;
+  height: 46px;
   background: linear-gradient(90deg, #eae6e0 0%, #f0ede8 50%, #e6e2dc 100%);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -138,6 +153,11 @@ body {
   position: relative;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.6);
+  /* when casino image is shown, remove top radius to attach */
+}
+.overlay-bar.has-casino {
+  border-radius: 0 0 4px 4px;
+  border-top: none;
 }
 .overlay-bar::after {
   content:'';
@@ -148,7 +168,7 @@ body {
 
 .ob-logo {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--text);
   letter-spacing: 2px;
@@ -159,7 +179,7 @@ body {
 .ob-logo em { color: var(--accent); font-style: normal; }
 
 .ob-div {
-  width:1px;height:20px;
+  width:1px;height:22px;
   background: var(--border);
   margin: 0 9px;
   flex-shrink:0;
@@ -167,7 +187,7 @@ body {
 
 .ob-icons { display:flex;gap:5px;flex-shrink:0; }
 .ob-icon {
-  width:24px;height:24px;border-radius:50%;
+  width:26px;height:26px;border-radius:50%;
   border:1px solid var(--border);
   display:flex;align-items:center;justify-content:center;
   color:var(--text-dim);
@@ -176,11 +196,11 @@ body {
   background: rgba(255,255,255,.5);
 }
 .ob-icon:hover { border-color:var(--accent);color:var(--text); }
-.ob-icon svg { width:11px;height:11px;fill:currentColor; }
+.ob-icon svg { width:13px;height:13px;fill:currentColor; }
 
 .ob-toggle-wrap { display:flex;align-items:center;gap:7px;flex-shrink:0; }
 .ob-mode-lbl {
-  font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;
+  font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;
   letter-spacing:1.5px;text-transform:uppercase;
   transition:color .3s;white-space:nowrap;
 }
@@ -189,7 +209,7 @@ body {
 .ob-mode-lbl.inactive     { color: var(--text-dim); }
 
 .ob-pill {
-  width:32px;height:17px;border-radius:9px;
+  width:34px;height:18px;border-radius:9px;
   position:relative;transition:background .35s,box-shadow .35s;
   flex-shrink:0;
 }
@@ -197,37 +217,37 @@ body {
 .ob-pill.raw   { background:linear-gradient(90deg,#388e3c,var(--green));box-shadow:0 0 8px rgba(76,175,80,.4); }
 .ob-pill::after {
   content:'';position:absolute;
-  width:13px;height:13px;background:#fff;border-radius:50%;
+  width:14px;height:14px;background:#fff;border-radius:50%;
   top:2px;transition:left .35s;
   box-shadow:0 1px 3px rgba(0,0,0,.25);
 }
 .ob-pill.wager::after { left:2px; }
-.ob-pill.raw::after   { left:17px; }
+.ob-pill.raw::after   { left:18px; }
 
 /* VIEWERS */
 .ob-viewers {
   display:flex;align-items:center;gap:5px;
-  font-size:11px;font-weight:700;color:var(--viewers);
+  font-size:13px;font-weight:700;color:var(--viewers);
   font-family:'Rajdhani',sans-serif;letter-spacing:.5px;
   flex-shrink:0;
 }
-.ob-viewers svg { width:13px;height:13px;fill:var(--viewers);flex-shrink:0; }
-.ob-viewers .vcount { font-size:12px; }
+.ob-viewers svg { width:14px;height:14px;fill:var(--viewers);flex-shrink:0; }
+.ob-viewers .vcount { font-size:13px; }
 
 /* SOCIAL CAROUSEL */
 .ob-social-carousel { display:flex;align-items:center;flex-shrink:0;overflow:hidden;position:relative; }
 .ob-soc-slide {
   display:flex;align-items:center;gap:4px;
-  font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;
+  font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;
   position:absolute;
   transition:opacity .5s, transform .5s;
   opacity:0;transform:translateX(20px);
 }
 .ob-soc-slide.active { opacity:1;transform:translateX(0);position:relative; }
 .ob-soc-slide.out    { opacity:0;transform:translateX(-20px);position:absolute; }
-.ob-soc-slide svg { width:13px;height:13px;flex-shrink:0; }
+.ob-soc-slide svg { width:14px;height:14px;flex-shrink:0; }
 .ob-soc-hide-btn {
-  width:16px;height:16px;border-radius:50%;
+  width:17px;height:17px;border-radius:50%;
   border:1px solid var(--border);background:rgba(255,255,255,.6);
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;flex-shrink:0;margin-left:4px;
@@ -242,14 +262,14 @@ body {
 .ob-ri {
   display:flex;align-items:center;gap:5px;
   padding:0 10px;border-left:1px solid var(--border);
-  font-size:11px;font-weight:600;color:var(--text-dim);white-space:nowrap;
+  font-size:13px;font-weight:600;color:var(--text-dim);white-space:nowrap;
 }
-.ob-ri svg { width:11px;height:11px;fill:var(--text-dim);flex-shrink:0; }
+.ob-ri svg { width:13px;height:13px;fill:var(--text-dim);flex-shrink:0; }
 .ob-ri.web { color:var(--text); }
 .ob-ri .dot { width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0; }
 .ob-age {
   background:rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.12);
-  border-radius:2px;padding:0 3px;font-size:8px;font-weight:800;
+  border-radius:2px;padding:0 4px;font-size:10px;font-weight:800;
   color:var(--text-dim);
 }
 
@@ -257,7 +277,7 @@ body {
 .quick-controls {
   display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;position:relative;
 }
-.status { display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim); }
+.status { display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-dim); }
 .status-dot { width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite; }
 
 /* ─── CONTROL PANEL ─── */
@@ -267,7 +287,7 @@ body {
   overflow-y:auto;max-height:calc(100vh - 120px);
 }
 .section-title {
-  font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;
+  font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;
   letter-spacing:2px;text-transform:uppercase;color:var(--accent);
   margin-bottom:10px;
 }
@@ -281,9 +301,9 @@ body {
 .toggle-row { display:flex;align-items:center;gap:18px;flex-wrap:wrap; }
 .big-toggle-wrap { display:flex;align-items:center;gap:14px; }
 .big-lbl {
-  font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;
+  font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;
   letter-spacing:2px;text-transform:uppercase;
-  min-width:80px;text-align:center;transition:color .3s;
+  min-width:90px;text-align:center;transition:color .3s;
 }
 .big-lbl.active-wager { color: var(--orange); }
 .big-lbl.active-raw   { color: var(--green); }
@@ -307,23 +327,23 @@ body {
 
 .mode-info { flex:1;min-width:180px; }
 .mode-info strong {
-  display:block;font-size:14px;font-weight:700;
+  display:block;font-size:15px;font-weight:700;
   font-family:'Rajdhani',sans-serif;letter-spacing:1px;
   margin-bottom:4px;
 }
 .mode-info.wager strong { color:var(--orange); }
 .mode-info.raw strong   { color:var(--green); }
-.mode-info p { font-size:12px;color:var(--text-dim);line-height:1.5; }
+.mode-info p { font-size:13px;color:var(--text-dim);line-height:1.5; }
 
 /* FIELDS */
 .fields-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
 @media(max-width:600px){ .fields-grid{grid-template-columns:1fr;} }
 .field { display:flex;flex-direction:column;gap:5px; }
-.field label { font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:.8px;text-transform:uppercase; }
+.field label { font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:.8px;text-transform:uppercase; }
 .field input {
   background:rgba(255,255,255,.7);border:1px solid var(--border);
   border-radius:5px;padding:9px 12px;color:var(--text);
-  font-family:'Exo 2',sans-serif;font-size:13px;
+  font-family:'Exo 2',sans-serif;font-size:14px;
   outline:none;transition:border .2s;
 }
 .field input:focus { border-color:var(--accent); }
@@ -335,9 +355,9 @@ body {
 }
 .soc-vis-btn {
   display:flex;align-items:center;gap:6px;
-  padding:7px 14px;border-radius:6px;
+  padding:8px 14px;border-radius:6px;
   border:1px solid var(--border);background:rgba(255,255,255,.6);
-  cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:12px;
+  cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:13px;
   font-weight:700;letter-spacing:1px;color:var(--text);
   transition:all .2s;
 }
@@ -349,8 +369,8 @@ body {
 
 .btn-row { display:flex;gap:10px;flex-wrap:wrap; }
 .btn {
-  padding:9px 20px;border-radius:6px;border:none;cursor:pointer;
-  font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;
+  padding:10px 22px;border-radius:6px;border:none;cursor:pointer;
+  font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;
   letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;
 }
 .btn-primary { background:var(--accent);color:#fff; }
@@ -361,16 +381,18 @@ body {
 .btn-toggle-wager:hover { box-shadow:0 0 12px rgba(224,112,64,.4); }
 .btn-toggle-raw { background:linear-gradient(90deg,#388e3c,var(--green));color:#fff; }
 .btn-toggle-raw:hover { box-shadow:0 0 12px rgba(76,175,80,.4); }
+.btn-danger { background:transparent;color:#c0392b;border:1px solid #c0392b;font-size:12px;padding:6px 14px; }
+.btn-danger:hover { background:#c0392b;color:#fff; }
 
 /* ─── OBS PANEL ─── */
 .obs-box {
   background:rgba(0,0,0,.04);border:1px dashed var(--border);
   border-radius:7px;padding:16px 18px;
-  font-size:12px;color:var(--text-dim);line-height:2;
+  font-size:13px;color:var(--text-dim);line-height:2;
 }
 .obs-box code {
   background:rgba(120,120,140,.12);color:var(--accent);
-  padding:1px 6px;border-radius:3px;font-size:11px;font-family:monospace;
+  padding:1px 6px;border-radius:3px;font-size:12px;font-family:monospace;
 }
 .obs-box strong { color:var(--text); }
 
@@ -378,11 +400,11 @@ body {
 .url-display input {
   flex:1;background:rgba(255,255,255,.7);border:1px solid var(--border);
   border-radius:5px;padding:9px 12px;color:var(--accent);
-  font-size:11px;outline:none;font-family:monospace;cursor:text;
+  font-size:12px;outline:none;font-family:monospace;cursor:text;
 }
 .copy-btn {
   padding:9px 16px;background:rgba(120,120,140,.1);border:1px solid var(--accent);
-  border-radius:5px;color:var(--accent);font-size:12px;font-weight:700;
+  border-radius:5px;color:var(--accent);font-size:13px;font-weight:700;
   font-family:'Rajdhani',sans-serif;letter-spacing:1px;cursor:pointer;
   transition:all .2s;white-space:nowrap;
 }
@@ -396,17 +418,17 @@ body {
   border-radius:6px;padding:10px 12px;text-align:center;
 }
 .dim-card .dim-val {
-  font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;
+  font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;
   color:var(--accent);display:block;
 }
-.dim-card .dim-lab { font-size:9px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase; }
+.dim-card .dim-lab { font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase; }
 
 /* TOAST */
 .toast {
   position:fixed;bottom:24px;right:24px;
   background:#fff;border:1px solid var(--border);
   border-radius:7px;padding:11px 18px;
-  font-size:12px;font-weight:600;color:var(--text);
+  font-size:13px;font-weight:600;color:var(--text);
   transform:translateY(60px);opacity:0;
   transition:all .3s;pointer-events:none;
   z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.12);
@@ -423,29 +445,105 @@ body.obs-mode #panel-overlay { display:flex!important; }
 body.obs-mode { background:transparent; }
 body.obs-mode .overlay-scene {
   display:flex!important;background:transparent;
-  padding:0;min-height:auto;
+  padding:0;min-height:auto;gap:0;
+  flex-direction:column;align-items:flex-start;
 }
 body.obs-mode .overlay-bar {
   border-radius:0;border:none;
   max-width:100%;width:100vw;
   box-shadow:none;
 }
+body.obs-mode .ob-casino-img {
+  max-width:100%;width:100vw;
+}
 
 /* TWITCH NOTE */
 .twitch-note {
-  font-size:11px;color:var(--text-dim);margin-top:10px;line-height:1.6;
+  font-size:12px;color:var(--text-dim);margin-top:10px;line-height:1.6;
   padding:10px 14px;background:rgba(120,120,140,.08);border-radius:6px;
   border-left:3px solid var(--viewers);
 }
 .twitch-note strong { color:var(--viewers); }
+
+/* ─── CASINO PANEL ─── */
+.casino-upload-area {
+  border:2px dashed var(--border);border-radius:8px;
+  padding:24px;text-align:center;cursor:pointer;
+  transition:all .2s;background:rgba(255,255,255,.4);
+  position:relative;
+}
+.casino-upload-area:hover { border-color:var(--accent);background:rgba(255,255,255,.7); }
+.casino-upload-area input[type=file] {
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+}
+.casino-upload-icon { font-size:28px;margin-bottom:8px; }
+.casino-upload-label { font-size:14px;font-weight:600;color:var(--text-dim); }
+.casino-upload-sub { font-size:11px;color:var(--text-dim);margin-top:4px; }
+
+.casino-name-row {
+  display:flex;gap:10px;align-items:flex-end;margin-top:16px;
+}
+.casino-name-row .field { flex:1; }
+
+/* CASINO BUTTONS GRID */
+.casino-grid {
+  display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;
+}
+.casino-btn {
+  display:flex;align-items:center;gap:10px;
+  padding:8px 14px 8px 8px;
+  border-radius:8px;border:2px solid var(--border);
+  background:rgba(255,255,255,.6);
+  cursor:pointer;transition:all .2s;
+  font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;
+  letter-spacing:.5px;color:var(--text);
+  max-width:220px;
+}
+.casino-btn:hover { border-color:var(--accent);background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08); }
+.casino-btn.active-casino { border-color:var(--green);background:rgba(76,175,80,.08);box-shadow:0 0 10px rgba(76,175,80,.2); }
+.casino-btn img {
+  width:40px;height:28px;object-fit:cover;border-radius:4px;flex-shrink:0;
+  border:1px solid var(--border);
+}
+.casino-btn-name { flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.casino-btn-del {
+  width:18px;height:18px;border-radius:50%;background:rgba(192,57,43,.12);
+  border:1px solid rgba(192,57,43,.25);color:#c0392b;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;flex-shrink:0;transition:all .2s;cursor:pointer;
+}
+.casino-btn-del:hover { background:#c0392b;color:#fff; }
+
+.casino-none {
+  font-size:13px;color:var(--text-dim);padding:12px 0;
+}
+
+.casino-active-info {
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;border-radius:6px;
+  background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.25);
+  margin-bottom:12px;font-size:13px;font-weight:600;
+}
+.casino-active-info span { flex:1; }
 </style>
 </head>
 <body>
 
+<!-- shared SVG defs (gradients etc) -->
+<svg width="0" height="0" style="position:absolute;pointer-events:none;">
+  <defs>
+    <linearGradient id="ig-g" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f09433"/>
+      <stop offset="50%" style="stop-color:#dc2743"/>
+      <stop offset="100%" style="stop-color:#bc1888"/>
+    </linearGradient>
+  </defs>
+</svg>
+
 <!-- HEADER -->
 <div class="app-header">
   <div>
-    <div class="app-logo">INU<em>H</em>ZAO <span style="font-size:13px;color:var(--text-dim);font-weight:500;letter-spacing:1px;">OVERLAY</span></div>
+    <div class="app-logo">INU<em>H</em>ZAO <span style="font-size:14px;color:var(--text-dim);font-weight:500;letter-spacing:1px;">OVERLAY</span></div>
     <div class="app-subtitle">Stream Overlay Manager</div>
   </div>
   <div class="live-badge">
@@ -458,6 +556,7 @@ body.obs-mode .overlay-bar {
 <div class="tabs">
   <div class="tab active" onclick="switchTab('overlay')">🎬 Preview</div>
   <div class="tab" onclick="switchTab('control')">⚙️ Controlo</div>
+  <div class="tab" onclick="switchTab('casino')">🎰 Casino</div>
   <div class="tab" onclick="switchTab('obs')">📡 OBS Setup</div>
 </div>
 
@@ -466,18 +565,13 @@ body.obs-mode .overlay-bar {
   <div class="overlay-scene">
     <div class="scene-label">Preview em tempo real</div>
 
+    <!-- CASINO IMAGE (shown above bar when active) -->
+    <div class="ob-casino-img" id="casino-img-wrap">
+      <img id="casino-img-el" src="" alt="Casino">
+    </div>
+
     <!-- THE BAR -->
     <div class="overlay-bar" id="obs-bar">
-      <svg width="0" height="0" style="position:absolute">
-        <defs>
-          <linearGradient id="ig-g" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#f09433"/>
-            <stop offset="50%" style="stop-color:#dc2743"/>
-            <stop offset="100%" style="stop-color:#bc1888"/>
-          </linearGradient>
-        </defs>
-      </svg>
-
       <div class="ob-logo" id="bar-logo">INU<em>H</em>ZAO</div>
       <div class="ob-div"></div>
 
@@ -504,7 +598,7 @@ body.obs-mode .overlay-bar {
       <div class="ob-div"></div>
 
       <!-- SOCIAL CAROUSEL -->
-      <div class="ob-social-carousel" id="social-carousel" style="min-width:130px;">
+      <div class="ob-social-carousel" id="social-carousel" style="min-width:140px;">
         <!-- slides injected by JS -->
       </div>
       <button class="ob-soc-hide-btn" id="hide-soc-btn" title="Esconder/Mostrar rede atual" onclick="toggleCurrentSocial()">✕</button>
@@ -550,7 +644,7 @@ body.obs-mode .overlay-bar {
           </div>
           <div class="mode-info raw" id="ctrl-mode-info">
             <strong id="ctrl-mode-name">Modo RAW</strong>
-            <p id="ctrl-mode-desc">Stream sem apostas — conteúdo normal, entretenimento puro. O toggle mostra RAW ativo.</p>
+            <p id="ctrl-mode-desc">Stream sem apostas — conteúdo normal, entretenimento puro.</p>
           </div>
         </div>
         <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
@@ -581,14 +675,22 @@ body.obs-mode .overlay-bar {
             <label>TikTok</label>
             <input type="text" id="cfg-tt" value="@inuhzao" placeholder="@username" oninput="applyConfig()">
           </div>
+          <div class="field">
+            <label>Telegram</label>
+            <input type="text" id="cfg-tg" value="" placeholder="@username ou link" oninput="applyConfig()">
+          </div>
+          <div class="field">
+            <label>Discord</label>
+            <input type="text" id="cfg-dc" value="" placeholder="discord.gg/..." oninput="applyConfig()">
+          </div>
         </div>
 
         <!-- VISIBILITY CONTROLS -->
         <div style="margin-top:16px;">
-          <div style="font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;">Visibilidade na Overlay</div>
-          <div class="soc-visibility">
+          <div style="font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;">Visibilidade na Overlay</div>
+          <div class="soc-visibility" id="soc-vis-container">
             <button class="soc-vis-btn" id="vis-ig" onclick="toggleSocialVisibility('ig')">
-              <svg viewBox="0 0 24 24" width="14" height="14" style="fill:url(#ig-g2)"><defs><linearGradient id="ig-g2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#f09433"/><stop offset="50%" style="stop-color:#dc2743"/><stop offset="100%" style="stop-color:#bc1888"/></linearGradient></defs><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              <svg viewBox="0 0 24 24" width="14" height="14" style="fill:url(#ig-g)"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               Instagram
             </button>
             <button class="soc-vis-btn" id="vis-tt" onclick="toggleSocialVisibility('tt')">
@@ -598,6 +700,14 @@ body.obs-mode .overlay-bar {
             <button class="soc-vis-btn" id="vis-web" onclick="toggleSocialVisibility('web')">
               <svg viewBox="0 0 24 24" width="14" height="14" style="fill:var(--accent);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
               Website
+            </button>
+            <button class="soc-vis-btn" id="vis-tg" onclick="toggleSocialVisibility('tg')" style="display:none;">
+              <svg viewBox="0 0 24 24" width="14" height="14" style="fill:#2196f3;"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.17 13.899l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.983.66z"/></svg>
+              Telegram
+            </button>
+            <button class="soc-vis-btn" id="vis-dc" onclick="toggleSocialVisibility('dc')" style="display:none;">
+              <svg viewBox="0 0 24 24" width="14" height="14" style="fill:#5865f2;"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+              Discord
             </button>
           </div>
         </div>
@@ -617,7 +727,56 @@ body.obs-mode .overlay-bar {
           <strong>👁 Viewers Twitch ao vivo</strong><br>
           A contagem de viewers é buscada da API pública da Twitch para o canal <strong>inuhzao</strong> a cada 60 segundos. Funciona automaticamente quando a overlay está aberta e o canal está em live.
           <br><br>
-          Nota: A API pública da Twitch requer autenticação para dados em tempo real. Se o número não aparecer, o canal pode não estar em live neste momento ou pode precisar de um token de API. O número mostrado na overlay é automaticamente atualizado.
+          Nota: Se o número não aparecer, o canal pode não estar em live neste momento.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ CASINO PANEL ══ -->
+<div class="panel" id="panel-casino">
+  <div class="control-panel">
+
+    <div>
+      <div class="section-title">Casino Ativo na Overlay</div>
+      <div class="card">
+        <div id="casino-active-display" style="display:none;" class="casino-active-info">
+          <span id="casino-active-name">—</span>
+          <button class="btn btn-danger" onclick="clearActiveCasino()">✕ Remover</button>
+        </div>
+        <div id="casino-none-active" style="font-size:13px;color:var(--text-dim);margin-bottom:12px;">
+          Nenhum casino ativo. Escolhe um abaixo para mostrar na overlay.
+        </div>
+        <div id="casino-grid" class="casino-grid">
+          <!-- injected by JS -->
+        </div>
+        <div id="casino-empty" class="casino-none" style="display:none;">
+          Ainda não adicionaste nenhum casino. Adiciona um abaixo. ↓
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Adicionar Casino</div>
+      <div class="card">
+        <div class="casino-upload-area" id="casino-drop-area">
+          <input type="file" id="casino-file-input" accept="image/*" onchange="handleCasinoFile(this)">
+          <div class="casino-upload-icon">🖼️</div>
+          <div class="casino-upload-label">Clica ou arrasta uma imagem</div>
+          <div class="casino-upload-sub">PNG, JPG, WebP — a imagem será ajustada à largura da overlay</div>
+        </div>
+        <div class="casino-name-row">
+          <div class="field">
+            <label>Nome do Casino</label>
+            <input type="text" id="casino-name-input" placeholder="Ex: Stake, Roobet, BC.Game…" style="font-size:14px;">
+          </div>
+          <button class="btn btn-primary" onclick="addCasino()" style="flex-shrink:0;height:42px;margin-bottom:1px;">➕ Adicionar</button>
+        </div>
+        <div id="casino-preview-wrap" style="display:none;margin-top:14px;">
+          <div style="font-size:11px;color:var(--text-dim);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;font-weight:700;">Pré-visualização</div>
+          <img id="casino-preview-img" style="max-width:100%;max-height:120px;border-radius:4px;border:1px solid var(--border);" src="" alt="">
         </div>
       </div>
     </div>
@@ -646,7 +805,7 @@ body.obs-mode .overlay-bar {
           <strong>4. Dimensões recomendadas</strong>
           <div class="dim-cards">
             <div class="dim-card"><span class="dim-val">1920</span><span class="dim-lab">Largura (px)</span></div>
-            <div class="dim-card"><span class="dim-val">44</span><span class="dim-lab">Altura (px)</span></div>
+            <div class="dim-card"><span class="dim-val">auto</span><span class="dim-lab">Altura (px)</span></div>
             <div class="dim-card"><span class="dim-val">1</span><span class="dim-lab">FPS (mínimo)</span></div>
           </div>
           <strong>5. CSS personalizado no OBS</strong><br>
@@ -665,7 +824,8 @@ body.obs-mode .overlay-bar {
           • Para mudar WAGER ↔ RAW: usa o toggle no tab <strong>Controlo</strong><br>
           • Podes esconder redes sociais individualmente no tab <strong>Controlo</strong><br>
           • O carrossel alterna automaticamente entre as redes ativas a cada 4s<br>
-          • Guarda a configuração no tab Controlo — fica guardada no browser
+          • Guarda a configuração no tab Controlo — fica guardada no browser<br>
+          • As imagens de casino ficam guardadas no browser — escolhe no tab Casino
         </div>
       </div>
     </div>
@@ -678,10 +838,14 @@ body.obs-mode .overlay-bar {
 <script>
 // ─── STATE ───
 let mode = 'raw';
-let socialVisibility = { ig: true, tt: true, web: true };
+let socialVisibility = { ig: true, tt: true, web: true, tg: false, dc: false };
 let carouselIndex = 0;
 let carouselTimer = null;
 let viewerTimer = null;
+
+// casinos: array of { id, name, dataUrl }
+let casinos = [];
+let activeCasinoId = null;
 
 // Check for OBS mode
 if (window.location.search.includes('obs=1')) {
@@ -690,16 +854,18 @@ if (window.location.search.includes('obs=1')) {
 
 // ─── TABS ───
 function switchTab(tab) {
-  ['overlay','control','obs'].forEach((t,i) => {
-    document.querySelectorAll('.tab')[i].classList.toggle('active', t===tab);
+  const tabNames = ['overlay','control','casino','obs'];
+  document.querySelectorAll('.tab').forEach((el,i) => {
+    el.classList.toggle('active', tabNames[i] === tab);
   });
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+tab).classList.add('active');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
 }
 
 // ─── MODE ───
 function setMode(m) {
   mode = m;
+  // update overlay bar
   const pill = document.getElementById('bar-pill');
   const lblW = document.getElementById('bar-lbl-wager');
   const lblR = document.getElementById('bar-lbl-raw');
@@ -707,6 +873,7 @@ function setMode(m) {
   lblW.className = 'ob-mode-lbl ' + (mode==='wager' ? 'active-wager' : 'inactive');
   lblR.className = 'ob-mode-lbl ' + (mode==='raw'   ? 'active-raw'   : 'inactive');
 
+  // update control panel
   const cp = document.getElementById('ctrl-pill');
   const cw = document.getElementById('ctrl-lbl-wager');
   const cr = document.getElementById('ctrl-lbl-raw');
@@ -725,7 +892,7 @@ function setMode(m) {
     cn.textContent='Modo WAGER';
     cd.textContent='Stream com apostas ativas — gambling content. O toggle mostra WAGER ativo.';
   }
-  // Guarda automaticamente ao mudar de modo
+  // auto-save mode
   try {
     const raw = localStorage.getItem('inuhzao_cfg');
     const cfg = raw ? JSON.parse(raw) : {};
@@ -737,19 +904,27 @@ function setMode(m) {
 
 function quickToggle() { setMode(mode === 'raw' ? 'wager' : 'raw'); }
 
-// ─── SOCIAL VISIBILITY ───
+// ─── SOCIAL DEFS ───
 const socialDefs = {
   ig: {
     label: '@inuhzao',
-    icon: `<svg viewBox="0 0 24 24" style="fill:url(#ig-g)"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`
+    icon: `<svg viewBox="0 0 24 24" width="14" height="14" style="fill:url(#ig-g);flex-shrink:0;"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`
   },
   tt: {
     label: '@inuhzao',
-    icon: `<svg viewBox="0 0 24 24" style="fill:#1a1a1e;width:12px;height:12px;"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.55V6.79a4.85 4.85 0 01-1.04-.1z"/></svg>`
+    icon: `<svg viewBox="0 0 24 24" width="14" height="14" style="fill:#1a1a1e;flex-shrink:0;"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.22 8.22 0 004.81 1.55V6.79a4.85 4.85 0 01-1.04-.1z"/></svg>`
   },
   web: {
     label: 'inuhzao.tv',
-    icon: `<svg viewBox="0 0 24 24" style="fill:var(--accent);width:12px;height:12px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`
+    icon: `<svg viewBox="0 0 24 24" width="14" height="14" style="fill:var(--accent);flex-shrink:0;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`
+  },
+  tg: {
+    label: '@inuhzao',
+    icon: `<svg viewBox="0 0 24 24" width="14" height="14" style="fill:#2196f3;flex-shrink:0;"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.17 13.899l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.983.66z"/></svg>`
+  },
+  dc: {
+    label: 'discord',
+    icon: `<svg viewBox="0 0 24 24" width="14" height="14" style="fill:#5865f2;flex-shrink:0;"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>`
   }
 };
 
@@ -771,9 +946,9 @@ function buildCarousel() {
   active.forEach((key, i) => {
     const def = socialDefs[key];
     const div = document.createElement('div');
-    div.className = 'ob-soc-slide' + (i === carouselIndex % active.length ? ' active' : '');
+    div.className = 'ob-soc-slide' + (i === 0 ? ' active' : '');
     div.id = 'slide-' + key;
-    div.innerHTML = def.icon + `<span style="margin-left:3px;">${def.label}</span>`;
+    div.innerHTML = def.icon + `<span style="margin-left:4px;">${def.label}</span>`;
     container.appendChild(div);
   });
 }
@@ -784,7 +959,9 @@ function startCarousel() {
     const active = getActiveSocials();
     if (active.length <= 1) return;
     const slides = document.querySelectorAll('.ob-soc-slide');
+    if (!slides.length) return;
     const current = Array.from(slides).findIndex(s => s.classList.contains('active'));
+    if (current === -1) return;
     const next = (current + 1) % slides.length;
     slides[current].classList.remove('active');
     slides[current].classList.add('out');
@@ -796,16 +973,13 @@ function startCarousel() {
 function toggleSocialVisibility(key) {
   socialVisibility[key] = !socialVisibility[key];
   const btn = document.getElementById('vis-' + key);
-  btn.classList.toggle('hidden-social', !socialVisibility[key]);
-  carouselIndex = 0;
+  if (btn) btn.classList.toggle('hidden-social', !socialVisibility[key]);
   buildCarousel();
   startCarousel();
   showToast(key.toUpperCase() + (socialVisibility[key] ? ' visível' : ' escondido'));
 }
 
 function toggleCurrentSocial() {
-  const active = getActiveSocials();
-  if (!active.length) return;
   const slides = document.querySelectorAll('.ob-soc-slide');
   let currentKey = null;
   slides.forEach(s => {
@@ -822,14 +996,40 @@ function applyConfig() {
   const ig   = document.getElementById('cfg-ig').value   || '@inuhzao';
   const tt   = document.getElementById('cfg-tt').value   || '@inuhzao';
   const web  = document.getElementById('cfg-web').value  || 'inuhzao.tv';
+  const tg   = document.getElementById('cfg-tg').value;
+  const dc   = document.getElementById('cfg-dc').value;
 
+  // logo
   const mid = Math.ceil(name.length / 2);
   document.getElementById('bar-logo').innerHTML =
     name.slice(0, mid-1) + '<em>' + (name[mid-1]||'') + '</em>' + name.slice(mid);
 
-  socialDefs.ig.label = ig;
-  socialDefs.tt.label = tt;
+  // update social defs
+  socialDefs.ig.label  = ig;
+  socialDefs.tt.label  = tt;
   socialDefs.web.label = web;
+  socialDefs.tg.label  = tg || '@telegram';
+  socialDefs.dc.label  = dc || 'discord';
+
+  // show/hide telegram & discord buttons based on whether field has value
+  const tgBtn = document.getElementById('vis-tg');
+  const dcBtn = document.getElementById('vis-dc');
+  if (tg) {
+    tgBtn.style.display = 'flex';
+    if (!socialVisibility.hasOwnProperty('tg')) socialVisibility.tg = true;
+    if (socialVisibility.tg === undefined) socialVisibility.tg = true;
+  } else {
+    tgBtn.style.display = 'none';
+    socialVisibility.tg = false;
+  }
+  if (dc) {
+    dcBtn.style.display = 'flex';
+    if (!socialVisibility.hasOwnProperty('dc')) socialVisibility.dc = true;
+    if (socialVisibility.dc === undefined) socialVisibility.dc = true;
+  } else {
+    dcBtn.style.display = 'none';
+    socialVisibility.dc = false;
+  }
 
   document.getElementById('bar-web').textContent = web;
 
@@ -843,6 +1043,8 @@ function saveConfig() {
     ig:   document.getElementById('cfg-ig').value,
     tt:   document.getElementById('cfg-tt').value,
     web:  document.getElementById('cfg-web').value,
+    tg:   document.getElementById('cfg-tg').value,
+    dc:   document.getElementById('cfg-dc').value,
     mode: mode,
     visibility: socialVisibility
   };
@@ -861,8 +1063,10 @@ function loadConfig() {
     document.getElementById('cfg-ig').value   = cfg.ig   || '@inuhzao';
     document.getElementById('cfg-tt').value   = cfg.tt   || '@inuhzao';
     document.getElementById('cfg-web').value  = cfg.web  || 'inuhzao.tv';
+    document.getElementById('cfg-tg').value   = cfg.tg   || '';
+    document.getElementById('cfg-dc').value   = cfg.dc   || '';
     if (cfg.visibility) {
-      socialVisibility = cfg.visibility;
+      socialVisibility = { ig: true, tt: true, web: true, tg: false, dc: false, ...cfg.visibility };
       Object.keys(socialVisibility).forEach(k => {
         const btn = document.getElementById('vis-' + k);
         if (btn) btn.classList.toggle('hidden-social', !socialVisibility[k]);
@@ -886,53 +1090,37 @@ function updateClock() {
 }
 
 // ─── VIEWERS (Twitch) ───
-// Uses Twitch Helix API via a CORS proxy / public endpoint
-// The channel name is: inuhzao
 async function fetchViewers() {
   const el = document.getElementById('viewer-count');
   try {
-    // Try via twitch API — requires auth, so we use a public proxy trick
-    // We'll try to fetch the stream data via an unofficial public endpoint
-    const r = await fetch('https://api.twitch.tv/helix/streams?user_login=inuhzao', {
+    const resp = await fetch('https://gql.twitch.tv/gql', {
+      method: 'POST',
       headers: {
-        'Client-Id': 'kimne78kx3ncx6brgo4mv6wki5h1ko', // public web client id
-        'Authorization': 'Bearer ' // no token available in browser context
-      }
-    });
-    // If the above fails we fall back to a scrape approach
-    throw new Error('no token');
-  } catch {
-    // Fallback: use a no-auth public Twitch endpoint via gql (public)
-    try {
-      const resp = await fetch('https://gql.twitch.tv/gql', {
-        method: 'POST',
-        headers: {
-          'Client-Id': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify([{
-          operationName: 'StreamMetadata',
-          variables: { channelLogin: 'inuhzao' },
-          extensions: {
-            persistedQuery: {
-              version: 1,
-              sha256Hash: 'a647c2a13599e5991e175155f798ca7f1ecddde73f7f341f39009c14dbf59aa8'
-            }
+        'Client-Id': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify([{
+        operationName: 'StreamMetadata',
+        variables: { channelLogin: 'inuhzao' },
+        extensions: {
+          persistedQuery: {
+            version: 1,
+            sha256Hash: 'a647c2a13599e5991e175155f798ca7f1ecddde73f7f341f39009c14dbf59aa8'
           }
-        }])
-      });
-      const data = await resp.json();
-      const stream = data?.[0]?.data?.user?.stream;
-      if (stream && stream.viewersCount !== undefined) {
-        el.textContent = stream.viewersCount.toLocaleString('pt-PT');
-        el.style.color = '';
-      } else {
-        el.textContent = 'offline';
-        el.style.color = 'var(--text-dim)';
-      }
-    } catch {
-      el.textContent = '—';
+        }
+      }])
+    });
+    const data = await resp.json();
+    const stream = data?.[0]?.data?.user?.stream;
+    if (stream && stream.viewersCount !== undefined) {
+      el.textContent = stream.viewersCount.toLocaleString('pt-PT');
+      el.style.color = '';
+    } else {
+      el.textContent = 'offline';
+      el.style.color = 'var(--text-dim)';
     }
+  } catch {
+    el.textContent = '—';
   }
 }
 
@@ -956,14 +1144,164 @@ function showToast(msg) {
   t._tid = setTimeout(()=>t.classList.remove('show'), 2400);
 }
 
+// ─── CASINO ───
+let pendingCasinoDataUrl = null;
+
+function handleCasinoFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    pendingCasinoDataUrl = e.target.result;
+    const prev = document.getElementById('casino-preview-img');
+    prev.src = pendingCasinoDataUrl;
+    document.getElementById('casino-preview-wrap').style.display = 'block';
+    // Auto-fill name from filename if empty
+    const nameInput = document.getElementById('casino-name-input');
+    if (!nameInput.value) {
+      nameInput.value = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function addCasino() {
+  const name = document.getElementById('casino-name-input').value.trim();
+  if (!name) { showToast('Dá um nome ao casino primeiro'); return; }
+  if (!pendingCasinoDataUrl) { showToast('Seleciona uma imagem primeiro'); return; }
+
+  const casino = {
+    id: Date.now().toString(),
+    name: name,
+    dataUrl: pendingCasinoDataUrl
+  };
+  casinos.push(casino);
+  saveCasinos();
+  renderCasinoGrid();
+
+  // reset form
+  document.getElementById('casino-name-input').value = '';
+  document.getElementById('casino-file-input').value = '';
+  document.getElementById('casino-preview-wrap').style.display = 'none';
+  pendingCasinoDataUrl = null;
+  showToast('✓ Casino "' + name + '" adicionado!');
+}
+
+function setActiveCasino(id) {
+  activeCasinoId = (activeCasinoId === id) ? null : id;
+  saveCasinos();
+  renderCasinoGrid();
+  updateCasinoOverlay();
+  const casino = casinos.find(c => c.id === id);
+  if (activeCasinoId && casino) {
+    showToast('Casino ativo: ' + casino.name);
+  } else {
+    showToast('Casino removido da overlay');
+  }
+}
+
+function clearActiveCasino() {
+  activeCasinoId = null;
+  saveCasinos();
+  renderCasinoGrid();
+  updateCasinoOverlay();
+  showToast('Casino removido da overlay');
+}
+
+function deleteCasino(id, e) {
+  e.stopPropagation();
+  if (activeCasinoId === id) {
+    activeCasinoId = null;
+    updateCasinoOverlay();
+  }
+  casinos = casinos.filter(c => c.id !== id);
+  saveCasinos();
+  renderCasinoGrid();
+  showToast('Casino eliminado');
+}
+
+function renderCasinoGrid() {
+  const grid = document.getElementById('casino-grid');
+  const empty = document.getElementById('casino-empty');
+  const activeDisplay = document.getElementById('casino-active-display');
+  const noneActive = document.getElementById('casino-none-active');
+
+  grid.innerHTML = '';
+  if (!casinos.length) {
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    casinos.forEach(c => {
+      const btn = document.createElement('div');
+      btn.className = 'casino-btn' + (c.id === activeCasinoId ? ' active-casino' : '');
+      btn.onclick = () => setActiveCasino(c.id);
+      btn.innerHTML = `
+        <img src="${c.dataUrl}" alt="${c.name}">
+        <span class="casino-btn-name">${c.name}</span>
+        <span class="casino-btn-del" onclick="deleteCasino('${c.id}', event)" title="Eliminar">✕</span>
+      `;
+      grid.appendChild(btn);
+    });
+  }
+
+  // active casino header
+  const active = casinos.find(c => c.id === activeCasinoId);
+  if (active) {
+    activeDisplay.style.display = 'flex';
+    noneActive.style.display = 'none';
+    document.getElementById('casino-active-name').textContent = '🎰 Ativo: ' + active.name;
+  } else {
+    activeDisplay.style.display = 'none';
+    noneActive.style.display = 'block';
+  }
+}
+
+function updateCasinoOverlay() {
+  const wrap = document.getElementById('casino-img-wrap');
+  const img  = document.getElementById('casino-img-el');
+  const bar  = document.getElementById('obs-bar');
+  const active = casinos.find(c => c.id === activeCasinoId);
+  if (active) {
+    img.src = active.dataUrl;
+    wrap.style.display = 'block';
+    bar.classList.add('has-casino');
+  } else {
+    wrap.style.display = 'none';
+    bar.classList.remove('has-casino');
+  }
+}
+
+function saveCasinos() {
+  try {
+    // Save only id+name+dataUrl; dataUrl can be large but works for local use
+    const payload = { casinos, activeCasinoId };
+    localStorage.setItem('inuhzao_casinos', JSON.stringify(payload));
+  } catch(e) {
+    showToast('Erro ao guardar casino (imagem grande demais?)');
+  }
+}
+
+function loadCasinos() {
+  try {
+    const raw = localStorage.getItem('inuhzao_casinos');
+    if (!raw) return;
+    const payload = JSON.parse(raw);
+    casinos = payload.casinos || [];
+    activeCasinoId = payload.activeCasinoId || null;
+    renderCasinoGrid();
+    updateCasinoOverlay();
+  } catch(e) {}
+}
+
 // ─── INIT ───
 updateClock();
 setInterval(updateClock, 30000);
 buildCarousel();
 startCarousel();
 loadConfig();
+loadCasinos();
 fetchViewers();
-setInterval(fetchViewers, 60000);
+viewerTimer = setInterval(fetchViewers, 60000);
 </script>
 </body>
 </html>
