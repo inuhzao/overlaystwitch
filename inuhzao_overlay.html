@@ -416,9 +416,10 @@ body {
 /* OVERLAY-ONLY MODE (for OBS) */
 body.obs-mode .app-header,
 body.obs-mode .tabs,
-body.obs-mode .panel,
 body.obs-mode .quick-controls,
 body.obs-mode .scene-label { display:none!important; }
+body.obs-mode .panel { display:none!important; }
+body.obs-mode #panel-overlay { display:flex!important; }
 body.obs-mode { background:transparent; }
 body.obs-mode .overlay-scene {
   display:flex!important;background:transparent;
