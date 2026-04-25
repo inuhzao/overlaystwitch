@@ -601,9 +601,15 @@ body.obs-mode .ob-casino-img {
       <div class="ob-social-carousel" id="social-carousel" style="min-width:140px;">
         <!-- slides injected by JS -->
       </div>
-      <button class="ob-soc-hide-btn" id="hide-soc-btn" title="Esconder/Mostrar rede atual" onclick="toggleCurrentSocial()">✕</button>
 
       <div class="ob-spacer"></div>
+
+      <!-- CASINO LOGO INSIDE BAR (à direita, antes do website) -->
+      <div class="ob-casino-inline" id="casino-inline" style="display:none;align-items:center;gap:6px;flex-shrink:0;">
+        <img id="casino-inline-img" src="" alt="" style="height:28px;width:auto;max-width:100px;object-fit:contain;border-radius:3px;">
+        <span id="casino-inline-name" style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--text);white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis;"></span>
+      </div>
+      <div class="ob-div" id="casino-sep" style="display:none;"></div>
 
       <div class="ob-right">
         <div class="ob-ri web">
@@ -938,11 +944,9 @@ function buildCarousel() {
   const active = getActiveSocials();
   if (!active.length) {
     container.style.display = 'none';
-    document.getElementById('hide-soc-btn').style.display = 'none';
     return;
   }
   container.style.display = 'flex';
-  document.getElementById('hide-soc-btn').style.display = 'flex';
   active.forEach((key, i) => {
     const def = socialDefs[key];
     const div = document.createElement('div');
@@ -1257,17 +1261,26 @@ function renderCasinoGrid() {
 }
 
 function updateCasinoOverlay() {
+  // OLD: image above bar — keep hidden always now
   const wrap = document.getElementById('casino-img-wrap');
-  const img  = document.getElementById('casino-img-el');
-  const bar  = document.getElementById('obs-bar');
+  if (wrap) wrap.style.display = 'none';
+  const bar = document.getElementById('obs-bar');
+  if (bar) bar.classList.remove('has-casino');
+
+  // NEW: casino logo inline inside the bar
+  const inlineWrap = document.getElementById('casino-inline');
+  const inlineImg  = document.getElementById('casino-inline-img');
+  const inlineName = document.getElementById('casino-inline-name');
+  const sep        = document.getElementById('casino-sep');
   const active = casinos.find(c => c.id === activeCasinoId);
-  if (active) {
-    img.src = active.dataUrl;
-    wrap.style.display = 'block';
-    bar.classList.add('has-casino');
-  } else {
-    wrap.style.display = 'none';
-    bar.classList.remove('has-casino');
+  if (active && inlineWrap) {
+    inlineImg.src = active.dataUrl;
+    inlineName.textContent = active.name;
+    inlineWrap.style.display = 'flex';
+    if (sep) sep.style.display = 'block';
+  } else if (inlineWrap) {
+    inlineWrap.style.display = 'none';
+    if (sep) sep.style.display = 'none';
   }
 }
 
@@ -1292,6 +1305,27 @@ function loadCasinos() {
     updateCasinoOverlay();
   } catch(e) {}
 }
+
+// ─── OBS SYNC via localStorage storage event ───
+// When the control panel (another tab) changes mode or casino,
+// the OBS browser source tab picks it up instantly via this event.
+window.addEventListener('storage', (e) => {
+  if (e.key === 'inuhzao_cfg') {
+    try {
+      const cfg = JSON.parse(e.newValue);
+      if (cfg.mode && cfg.mode !== mode) setMode(cfg.mode);
+    } catch(err) {}
+  }
+  if (e.key === 'inuhzao_casinos') {
+    try {
+      const payload = JSON.parse(e.newValue);
+      casinos = payload.casinos || [];
+      activeCasinoId = payload.activeCasinoId || null;
+      renderCasinoGrid();
+      updateCasinoOverlay();
+    } catch(err) {}
+  }
+});
 
 // ─── INIT ───
 updateClock();
