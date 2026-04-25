@@ -442,11 +442,22 @@ body.obs-mode .quick-controls,
 body.obs-mode .scene-label { display:none!important; }
 body.obs-mode .panel { display:none!important; }
 body.obs-mode #panel-overlay { display:flex!important; }
-body.obs-mode { background:transparent; }
+body.obs-mode { background:transparent!important; min-height:0!important; height:auto!important; overflow:hidden!important; }
 body.obs-mode .overlay-scene {
   display:flex!important;background:transparent;
-  padding:0;min-height:auto;gap:0;
+  padding:0;min-height:0!important;height:auto!important;gap:0;
   flex-direction:column;align-items:flex-start;
+  flex:0 0 auto!important;
+  justify-content:flex-start!important;
+}
+body.obs-mode #panel-overlay {
+  flex:0 0 auto!important;
+  height:auto!important;
+  min-height:0!important;
+}
+body.obs-mode {
+  height:auto!important;
+  min-height:0!important;
 }
 body.obs-mode .overlay-bar {
   border-radius:0;border:none;
@@ -602,8 +613,6 @@ body.obs-mode .ob-casino-img {
         <!-- slides injected by JS -->
       </div>
 
-      <div class="ob-spacer"></div>
-
       <!-- CASINO LOGO INSIDE BAR (à direita, antes do website) -->
       <div class="ob-casino-inline" id="casino-inline" style="display:none;align-items:center;gap:6px;flex-shrink:0;">
         <img id="casino-inline-img" src="" alt="" style="height:28px;width:auto;max-width:100px;object-fit:contain;border-radius:3px;">
@@ -611,7 +620,7 @@ body.obs-mode .ob-casino-img {
       </div>
       <div class="ob-div" id="casino-sep" style="display:none;"></div>
 
-      <div class="ob-right">
+      <div class="ob-right" style="margin-left:auto;">
         <div class="ob-ri web">
           <div class="dot"></div>
           <span id="bar-web">inuhzao.tv</span>
@@ -903,7 +912,10 @@ function setMode(m) {
     cfg.mode = mode;
     localStorage.setItem('inuhzao_cfg', JSON.stringify(cfg));
   } catch(e){}
-  if (!isObsMode) showToast('Modo alterado → ' + mode.toUpperCase());
+  if (!isObsMode) {
+    showToast('Modo alterado → ' + mode.toUpperCase());
+    syncAfterChange();
+  }
 }
 
 function quickToggle() { setMode(mode === 'raw' ? 'wager' : 'raw'); }
@@ -1194,8 +1206,8 @@ function setActiveCasino(id) {
   saveCasinos();
   renderCasinoGrid();
   updateCasinoOverlay();
-  // Save full config so OBS polling reads latest state
-  saveConfig();
+  // Push to GitHub so OBS picks up the change
+  if (!isObsMode) syncAfterChange();
   const casino = casinos.find(c => c.id === id);
   if (activeCasinoId && casino) {
     showToast('Casino ativo: ' + casino.name);
@@ -1209,6 +1221,7 @@ function clearActiveCasino() {
   saveCasinos();
   renderCasinoGrid();
   updateCasinoOverlay();
+  if (!isObsMode) syncAfterChange();
   showToast('Casino removido da overlay');
 }
 
@@ -1306,33 +1319,86 @@ function loadCasinos() {
   } catch(e) {}
 }
 
-// ─── OBS URL GENERATION ───
-// O OBS é isolado — localStorage não funciona entre o teu browser e o OBS.
-// Solução: o estado é codificado no URL. Sempre que mudas modo ou casino,
-// clicas "Copiar URL OBS" e fazes Refresh no OBS Browser Source.
+// ─── GITHUB SYNC ───
+const GITHUB_TOKEN = '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';
+const GITHUB_REPO  = 'inuhzao/overlaystwitch';
+const STATE_FILE   = 'obs_state.json';
+const RAW_URL      = 'https://raw.githubusercontent.com/' + GITHUB_REPO + '/main/' + STATE_FILE;
+const API_URL      = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + STATE_FILE;
 
-function generateObsUrl() {
-  const base = window.location.href.split('?')[0].split('#')[0];
+async function pushStateToGitHub() {
   const activeCasino = casinos.find(c => c.id === activeCasinoId);
   const state = {
-    m: mode,
-    c: activeCasino ? activeCasino.dataUrl : null,
-    cn: activeCasino ? activeCasino.name : null
+    mode: mode,
+    casinoUrl: activeCasino ? activeCasino.dataUrl : null,
+    casinoName: activeCasino ? activeCasino.name : null,
+    ts: Date.now()
   };
-  // Store state in sessionStorage with a key, pass key in URL
-  // For large images we use a state key approach
-  const key = 'obs_state_' + Date.now();
-  try { sessionStorage.setItem('inuhzao_obs_latest', JSON.stringify(state)); } catch(e) {}
-  return base + '?obs=1';
+  const body = JSON.stringify(state);
+  const encoded = btoa(unescape(encodeURIComponent(body)));
+
+  try {
+    // Get current SHA (needed to update existing file)
+    let sha = null;
+    const check = await fetch(API_URL, {
+      headers: { 'Authorization': 'token ' + GITHUB_TOKEN }
+    });
+    if (check.ok) {
+      const data = await check.json();
+      sha = data.sha;
+    }
+
+    const payload = {
+      message: 'obs sync: ' + new Date().toISOString(),
+      content: encoded,
+      ...(sha ? { sha } : {})
+    };
+
+    const resp = await fetch(API_URL, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + GITHUB_TOKEN,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (resp.ok) {
+      showToast('✓ OBS sincronizado!');
+    } else {
+      const err = await resp.json();
+      showToast('Erro sync: ' + (err.message || resp.status));
+    }
+  } catch(e) {
+    showToast('Erro ao sincronizar: ' + e.message);
+  }
 }
 
-function applyObsState() {
-  // In OBS mode: load state from sessionStorage (same origin, same browser won't help)
-  // Real fix: read from localStorage directly — OBS uses same origin as GitHub Pages
-  // OBS Browser Source DOES share localStorage with the same origin on the same machine
-  // The issue was the storage EVENT (cross-tab) not the storage itself
-  loadConfig();
-  loadCasinos();
+async function pullStateFromGitHub() {
+  try {
+    // Add timestamp to bust CDN cache
+    const resp = await fetch(RAW_URL + '?t=' + Date.now());
+    if (!resp.ok) return;
+    const state = await resp.json();
+
+    // Apply mode
+    if (state.mode && state.mode !== mode) setMode(state.mode);
+
+    // Apply casino inline
+    const inlineWrap = document.getElementById('casino-inline');
+    const inlineImg  = document.getElementById('casino-inline-img');
+    const inlineName = document.getElementById('casino-inline-name');
+    const sep        = document.getElementById('casino-sep');
+    if (state.casinoUrl && inlineWrap) {
+      inlineImg.src = state.casinoUrl;
+      inlineName.textContent = state.casinoName || '';
+      inlineWrap.style.display = 'flex';
+      if (sep) sep.style.display = 'block';
+    } else if (inlineWrap) {
+      inlineWrap.style.display = 'none';
+      if (sep) sep.style.display = 'none';
+    }
+  } catch(e) {}
 }
 
 function copyObsUrl() {
@@ -1340,25 +1406,22 @@ function copyObsUrl() {
   const url = base + '?obs=1';
   const inp = document.getElementById('obs-url-input');
   if (inp) inp.value = url;
-  // Save current state so OBS can read it on refresh
-  saveConfig();
-  saveCasinos();
   navigator.clipboard.writeText(url).then(() => {
     const b = document.getElementById('copy-url-btn');
     if (!b) return;
     const prev = b.textContent;
-    b.textContent = '✓ URL Copiado!'; b.classList.add('copied');
+    b.textContent = '✓ Copiado!'; b.classList.add('copied');
     setTimeout(() => { b.textContent = prev; b.classList.remove('copied'); }, 2500);
-  }).catch(() => { if (inp) { inp.select(); } });
-  showToast('✓ Cola no OBS e faz Refresh!');
+  }).catch(() => { if (inp) inp.select(); });
 }
 
 function copyUrl() { copyObsUrl(); }
 
-// Polling: OBS re-reads localStorage every 5s to pick up changes
-function obsPolling() {
-  loadConfig();
-  loadCasinos();
+// Wrap setMode to also push to GitHub when not in OBS
+const _origSetMode = setMode;
+// Push state after mode change (called from buttons, not from OBS pull)
+function syncAfterChange() {
+  if (!isObsMode) pushStateToGitHub();
 }
 
 // ─── INIT ───
@@ -1372,9 +1435,13 @@ fetchViewers();
 viewerTimer = setInterval(fetchViewers, 60000);
 
 if (isObsMode) {
-  // Poll localStorage every 5 seconds — works because OBS Browser Source
-  // uses the same localStorage origin as the GitHub Pages URL
-  setInterval(obsPolling, 5000);
+  // OBS mode: pull state from GitHub every 5 seconds
+  pullStateFromGitHub();
+  setInterval(pullStateFromGitHub, 5000);
+} else {
+  // Panel mode: set the OBS URL in the input
+  const inp = document.getElementById('obs-url-input');
+  if (inp) inp.value = window.location.href.split('?')[0] + '?obs=1';
 }
 </script>
 </body>
