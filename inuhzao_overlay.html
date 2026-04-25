@@ -442,22 +442,19 @@ body.obs-mode .quick-controls,
 body.obs-mode .scene-label { display:none!important; }
 body.obs-mode .panel { display:none!important; }
 body.obs-mode #panel-overlay { display:flex!important; }
-body.obs-mode { background:transparent!important; min-height:0!important; height:auto!important; overflow:hidden!important; }
+body.obs-mode { background:transparent!important; min-height:0!important; height:46px!important; overflow:hidden!important; }
+html.obs-html { min-height:0!important; height:46px!important; overflow:hidden!important; }
 body.obs-mode .overlay-scene {
-  display:flex!important;background:transparent;
-  padding:0;min-height:0!important;height:auto!important;gap:0;
-  flex-direction:column;align-items:flex-start;
-  flex:0 0 auto!important;
-  justify-content:flex-start!important;
+  display:flex!important;background:transparent!important;
+  padding:0!important;min-height:0!important;height:46px!important;gap:0!important;
+  flex-direction:column!important;align-items:flex-start!important;
+  flex:0 0 46px!important;overflow:hidden!important;
 }
 body.obs-mode #panel-overlay {
-  flex:0 0 auto!important;
-  height:auto!important;
+  flex:0 0 46px!important;
+  height:46px!important;
   min-height:0!important;
-}
-body.obs-mode {
-  height:auto!important;
-  min-height:0!important;
+  overflow:hidden!important;
 }
 body.obs-mode .overlay-bar {
   border-radius:0;border:none;
@@ -817,7 +814,7 @@ body.obs-mode .ob-casino-img {
           <strong>2. No OBS:</strong> Fontes → <code>+</code> → <code>Navegador (Browser Source)</code><br>
           Cola o URL copiado. Largura: <code>1920</code> · Altura: <code>46</code><br><br>
           <strong>3. CSS no OBS (campo "CSS Personalizado"):</strong><br>
-          <code>body { background: transparent !important; overflow: hidden; }</code><br><br>
+          <code>body { background: transparent !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; height: 46px !important; min-height: 0 !important; }</code><br><br>
           <strong>4. Quando mudares modo ou casino:</strong><br>
           Clica <strong>Copiar URL OBS</strong> aqui no painel — o OBS atualiza sozinho em até 5 segundos. Se não atualizar, clica Refresh no Browser Source.
           <div class="dim-cards" style="margin-top:12px;">
@@ -851,6 +848,7 @@ body.obs-mode .ob-casino-img {
 
 <script>
 // ─── STATE ───
+let _loadingConfig = false; // blocks sync during init
 let mode = 'raw';
 let socialVisibility = { ig: true, tt: true, web: true, tg: false, dc: false };
 let carouselIndex = 0;
@@ -863,7 +861,10 @@ let activeCasinoId = null;
 
 // Check for OBS mode
 const isObsMode = window.location.search.includes('obs=1');
-if (isObsMode) document.body.classList.add('obs-mode');
+if (isObsMode) {
+  document.body.classList.add('obs-mode');
+  document.documentElement.classList.add('obs-html');
+}
 
 // ─── TABS ───
 function switchTab(tab) {
@@ -912,7 +913,7 @@ function setMode(m) {
     cfg.mode = mode;
     localStorage.setItem('inuhzao_cfg', JSON.stringify(cfg));
   } catch(e){}
-  if (!isObsMode) {
+  if (!isObsMode && !_loadingConfig) {
     showToast('Modo alterado → ' + mode.toUpperCase());
     syncAfterChange();
   }
@@ -1070,8 +1071,9 @@ function saveConfig() {
 
 function loadConfig() {
   try {
+    _loadingConfig = true;
     const raw = localStorage.getItem('inuhzao_cfg');
-    if (!raw) { applyConfig(); return; }
+    if (!raw) { _loadingConfig = false; applyConfig(); return; }
     const cfg = JSON.parse(raw);
     document.getElementById('cfg-name').value = cfg.name || 'INUHZAO';
     document.getElementById('cfg-ig').value   = cfg.ig   || '@inuhzao';
@@ -1088,7 +1090,8 @@ function loadConfig() {
     }
     applyConfig();
     if (cfg.mode) setMode(cfg.mode);
-  } catch(e) { showToast('Erro ao carregar config'); }
+    _loadingConfig = false;
+  } catch(e) { _loadingConfig = false; showToast('Erro ao carregar config'); }
 }
 
 // ─── CLOCK ───
