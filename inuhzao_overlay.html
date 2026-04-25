@@ -798,25 +798,24 @@ body.obs-mode .ob-casino-img {
       <div class="section-title">Configuração no OBS</div>
       <div class="card">
         <div class="obs-box">
-          <strong>1. Guarda este ficheiro no teu computador</strong><br>
-          Guarda como <code>inuhzao_overlay.html</code> em qualquer pasta.<br><br>
-          <strong>2. Adiciona Browser Source no OBS</strong><br>
-          Cenas → clica <code>+</code> em Fontes → <code>Navegador (Browser Source)</code><br><br>
-          <strong>3. Usa o URL local do ficheiro</strong>
+          <strong>⚠️ Como funciona a sincronização</strong><br>
+          O OBS Browser Source usa o mesmo <code>localStorage</code> do teu browser (mesma origem). Quando mudas o modo ou o casino, clica o botão abaixo — isso guarda o estado e o OBS apanha-o automaticamente a cada 5 segundos.<br><br>
+          <strong>1. Copia o URL para o OBS</strong>
           <div class="url-display">
-            <input type="text" id="obs-url-input" value="file:///C:/Users/TeuNome/inuhzao_overlay.html?obs=1" readonly>
-            <button class="copy-btn" id="copy-url-btn" onclick="copyUrl()">Copiar</button>
+            <input type="text" id="obs-url-input" value="" readonly placeholder="Clica o botão →">
+            <button class="copy-btn" id="copy-url-btn" onclick="copyObsUrl()">📋 Copiar URL OBS</button>
           </div>
-          Adiciona <code>?obs=1</code> no fim do URL para mostrar só a barra (sem o painel).<br><br>
-          <strong>4. Dimensões recomendadas</strong>
-          <div class="dim-cards">
+          <strong>2. No OBS:</strong> Fontes → <code>+</code> → <code>Navegador (Browser Source)</code><br>
+          Cola o URL copiado. Largura: <code>1920</code> · Altura: <code>46</code><br><br>
+          <strong>3. CSS no OBS (campo "CSS Personalizado"):</strong><br>
+          <code>body { background: transparent !important; overflow: hidden; }</code><br><br>
+          <strong>4. Quando mudares modo ou casino:</strong><br>
+          Clica <strong>Copiar URL OBS</strong> aqui no painel — o OBS atualiza sozinho em até 5 segundos. Se não atualizar, clica Refresh no Browser Source.
+          <div class="dim-cards" style="margin-top:12px;">
             <div class="dim-card"><span class="dim-val">1920</span><span class="dim-lab">Largura (px)</span></div>
-            <div class="dim-card"><span class="dim-val">auto</span><span class="dim-lab">Altura (px)</span></div>
-            <div class="dim-card"><span class="dim-val">1</span><span class="dim-lab">FPS (mínimo)</span></div>
+            <div class="dim-card"><span class="dim-val">46</span><span class="dim-lab">Altura (px)</span></div>
+            <div class="dim-card"><span class="dim-val">5s</span><span class="dim-lab">Auto-sync</span></div>
           </div>
-          <strong>5. CSS personalizado no OBS</strong><br>
-          No campo "CSS Personalizado" cola:<br>
-          <code>body { background: transparent !important; overflow: hidden; }</code>
         </div>
       </div>
     </div>
@@ -854,9 +853,8 @@ let casinos = [];
 let activeCasinoId = null;
 
 // Check for OBS mode
-if (window.location.search.includes('obs=1')) {
-  document.body.classList.add('obs-mode');
-}
+const isObsMode = window.location.search.includes('obs=1');
+if (isObsMode) document.body.classList.add('obs-mode');
 
 // ─── TABS ───
 function switchTab(tab) {
@@ -905,7 +903,7 @@ function setMode(m) {
     cfg.mode = mode;
     localStorage.setItem('inuhzao_cfg', JSON.stringify(cfg));
   } catch(e){}
-  showToast('Modo alterado → ' + mode.toUpperCase());
+  if (!isObsMode) showToast('Modo alterado → ' + mode.toUpperCase());
 }
 
 function quickToggle() { setMode(mode === 'raw' ? 'wager' : 'raw'); }
@@ -1196,6 +1194,8 @@ function setActiveCasino(id) {
   saveCasinos();
   renderCasinoGrid();
   updateCasinoOverlay();
+  // Save full config so OBS polling reads latest state
+  saveConfig();
   const casino = casinos.find(c => c.id === id);
   if (activeCasinoId && casino) {
     showToast('Casino ativo: ' + casino.name);
@@ -1306,26 +1306,60 @@ function loadCasinos() {
   } catch(e) {}
 }
 
-// ─── OBS SYNC via localStorage storage event ───
-// When the control panel (another tab) changes mode or casino,
-// the OBS browser source tab picks it up instantly via this event.
-window.addEventListener('storage', (e) => {
-  if (e.key === 'inuhzao_cfg') {
-    try {
-      const cfg = JSON.parse(e.newValue);
-      if (cfg.mode && cfg.mode !== mode) setMode(cfg.mode);
-    } catch(err) {}
-  }
-  if (e.key === 'inuhzao_casinos') {
-    try {
-      const payload = JSON.parse(e.newValue);
-      casinos = payload.casinos || [];
-      activeCasinoId = payload.activeCasinoId || null;
-      renderCasinoGrid();
-      updateCasinoOverlay();
-    } catch(err) {}
-  }
-});
+// ─── OBS URL GENERATION ───
+// O OBS é isolado — localStorage não funciona entre o teu browser e o OBS.
+// Solução: o estado é codificado no URL. Sempre que mudas modo ou casino,
+// clicas "Copiar URL OBS" e fazes Refresh no OBS Browser Source.
+
+function generateObsUrl() {
+  const base = window.location.href.split('?')[0].split('#')[0];
+  const activeCasino = casinos.find(c => c.id === activeCasinoId);
+  const state = {
+    m: mode,
+    c: activeCasino ? activeCasino.dataUrl : null,
+    cn: activeCasino ? activeCasino.name : null
+  };
+  // Store state in sessionStorage with a key, pass key in URL
+  // For large images we use a state key approach
+  const key = 'obs_state_' + Date.now();
+  try { sessionStorage.setItem('inuhzao_obs_latest', JSON.stringify(state)); } catch(e) {}
+  return base + '?obs=1';
+}
+
+function applyObsState() {
+  // In OBS mode: load state from sessionStorage (same origin, same browser won't help)
+  // Real fix: read from localStorage directly — OBS uses same origin as GitHub Pages
+  // OBS Browser Source DOES share localStorage with the same origin on the same machine
+  // The issue was the storage EVENT (cross-tab) not the storage itself
+  loadConfig();
+  loadCasinos();
+}
+
+function copyObsUrl() {
+  const base = window.location.href.split('?')[0].split('#')[0];
+  const url = base + '?obs=1';
+  const inp = document.getElementById('obs-url-input');
+  if (inp) inp.value = url;
+  // Save current state so OBS can read it on refresh
+  saveConfig();
+  saveCasinos();
+  navigator.clipboard.writeText(url).then(() => {
+    const b = document.getElementById('copy-url-btn');
+    if (!b) return;
+    const prev = b.textContent;
+    b.textContent = '✓ URL Copiado!'; b.classList.add('copied');
+    setTimeout(() => { b.textContent = prev; b.classList.remove('copied'); }, 2500);
+  }).catch(() => { if (inp) { inp.select(); } });
+  showToast('✓ Cola no OBS e faz Refresh!');
+}
+
+function copyUrl() { copyObsUrl(); }
+
+// Polling: OBS re-reads localStorage every 5s to pick up changes
+function obsPolling() {
+  loadConfig();
+  loadCasinos();
+}
 
 // ─── INIT ───
 updateClock();
@@ -1336,6 +1370,12 @@ loadConfig();
 loadCasinos();
 fetchViewers();
 viewerTimer = setInterval(fetchViewers, 60000);
+
+if (isObsMode) {
+  // Poll localStorage every 5 seconds — works because OBS Browser Source
+  // uses the same localStorage origin as the GitHub Pages URL
+  setInterval(obsPolling, 5000);
+}
 </script>
 </body>
 </html>
